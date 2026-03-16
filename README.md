@@ -148,7 +148,7 @@ graph TD
 pip install torch torchvision matplotlib numpy tqdm
 ```
 
-Or if using Google Colab, these are pre-installed. The notebook also auto-downloads a `helper_functions.py` file from [mrdbourke/pytorch-deep-learning](https://github.com/mrdbourke/pytorch-deep-learning) if it's not already present.
+Or if using Google Colab, these are pre-installed.
 
 ### Running the Notebook
 
@@ -221,5 +221,4 @@ Predictions are visualized on a random sample of 9 test images:
 ## Acknowledgements
 
 - Dataset: [FashionMNIST](https://github.com/zalandoresearch/fashion-mnist) by Zalando Research
-- Helper functions from [mrdbourke/pytorch-deep-learning](https://github.com/mrdbourke/pytorch-deep-learning)
 - CNN architecture inspired by [TinyVGG](https://poloclub.github.io/cnn-explainer/)
