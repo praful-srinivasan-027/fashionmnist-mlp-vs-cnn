@@ -122,8 +122,7 @@ graph TD
 
 ```
 .
-├── Pytorch_computer_vision_video.ipynb   # Main notebook
-├── helper_functions.py                   # Auto-downloaded utility functions (mrdbourke/pytorch-deep-learning)
+├── CNN_Fashion_MNIST.ipynb               # Main notebook
 ├── data/                                 # FashionMNIST dataset (auto-downloaded by torchvision)
 ├── FashionMNIST                          # Saved MLP model (torch.save)
 └── FashionMNISTCNN                       # Saved CNN model (torch.save)
@@ -154,7 +153,7 @@ Or if using Google Colab, these are pre-installed.
 
 **Locally:**
 ```bash
-jupyter notebook Pytorch_computer_vision_video.ipynb
+jupyter notebook CNN_Fashion_MNIST.ipynb
 ```
 
 **On Google Colab:**
