@@ -1,42 +1,36 @@
-# PyTorch Computer Vision: FashionMNIST Classifier
+# FashionMNIST — MLP vs CNN
 
-A computer vision project built with PyTorch that trains and compares two neural network architectures — a fully connected classifier and a convolutional neural network (CNN) — on the FashionMNIST dataset. The project covers the full ML workflow: data loading, preprocessing, model definition, training, evaluation, and prediction visualization.
+One of those projects where the whole point was to *feel* the difference between a plain neural network and a CNN, not just read about it. Built both from scratch in PyTorch, trained them on FashionMNIST, and compared what happened.
 
 ---
 
 ## Table of Contents
 
-- [Overview](#overview)
+- [What's this about](#whats-this-about)
 - [Dataset](#dataset)
 - [Models](#models)
-  - [Model 1: Fully Connected Classifier](#model-1-fully-connected-classifier)
+  - [Model 1: MLP](#model-1-mlp)
   - [Model 2: CNN (TinyVGG-inspired)](#model-2-cnn-tinyvgg-inspired)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Running the Notebook](#running-the-notebook)
 - [Training Details](#training-details)
 - [Results](#results)
-- [Key Concepts Covered](#key-concepts-covered)
+- [What I learned](#what-i-learned)
 - [Acknowledgements](#acknowledgements)
 
 ---
 
-## Overview
+## What's this about
 
-This notebook explores image classification using PyTorch on the FashionMNIST dataset. Two architectures are built from scratch and compared:
+I wanted to understand why everyone keeps saying CNNs are better for images. So instead of just taking it on faith, I built an MLP first — flattening images and throwing them at linear layers — then built a CNN and trained both on the same dataset.
 
-1. A **multi-layer perceptron (MLP)** with a single hidden layer of 1000 neurons, trained for 25 epochs using SGD.
-2. A **convolutional neural network (CNN)** based on the TinyVGG architecture, trained for 3 epochs using Adam.
-
-The CNN achieves comparable or better accuracy in far fewer epochs, demonstrating the advantage of convolutional architectures for image tasks.
+The MLP needed 25 epochs with SGD to get decent results. The CNN got there in 3 epochs with Adam. That gap is the whole lesson.
 
 ---
 
 ## Dataset
 
-**FashionMNIST** is a dataset of 28×28 grayscale images of clothing items across 10 categories:
+FashionMNIST — 70,000 grayscale images of clothing, 28×28 pixels each, 10 classes. It's basically the go-to dataset when MNIST feels too easy but you don't want to deal with full-blown image datasets yet.
 
 | Label | Class        |
 |-------|--------------|
@@ -51,21 +45,23 @@ The CNN achieves comparable or better accuracy in far fewer epochs, demonstratin
 | 8     | Bag          |
 | 9     | Ankle boot   |
 
-- **Training samples:** 60,000
-- **Test samples:** 10,000
-- **Image shape:** `(1, 28, 28)` — single-channel grayscale
+- **Train:** 60,000 images
+- **Test:** 10,000 images
+- **Shape:** `(1, 28, 28)` — single channel, grayscale
 
-**Preprocessing:** All images are converted to tensors and normalized with mean `0.5` and std `0.5`, mapping pixel values to the range `[-1, 1]`.
+Images are normalized to `[-1, 1]` using mean and std of `0.5`.
 
 ---
 
 ## Models
 
-### Model 1: Fully Connected Classifier
+### Model 1: MLP
+
+The naive approach — flatten the image into 784 numbers and hope the network figures it out.
 
 ```mermaid
 graph TD
-    A["Input (1 × 28 × 28)"] --> B[Flatten\n784 features]
+    A["Input (1 × 28 × 28)"] --> B["Flatten — 784 features"]
     B --> C["Linear (784 → 1000)"]
     C --> D[ReLU]
     D --> E["Linear (1000 → 10)"]
@@ -73,15 +69,13 @@ graph TD
     F --> G["Logits (10)"]
 ```
 
-- **Architecture:** `nn.Sequential` with a `Flatten` layer, two linear layers, and ReLU activations
-- **Hidden units:** 1000
-- **Output:** 10 class logits
 - **Optimizer:** SGD (lr=0.1)
-- **Loss:** CrossEntropyLoss
 - **Epochs:** 25
 - **Batch size:** 32
 
 ### Model 2: CNN (TinyVGG-inspired)
+
+Two convolutional blocks that actually look at the image spatially before making predictions. Based loosely on the TinyVGG architecture.
 
 ```mermaid
 graph TD
@@ -108,11 +102,7 @@ graph TD
     E --> F["Logits (10)"]
 ```
 
-- **Architecture:** Two convolutional blocks with MaxPooling, followed by a linear classifier head
-- **Hidden units:** 32 channels per conv layer
-- **Output:** 10 class logits
 - **Optimizer:** Adam (lr=1e-3)
-- **Loss:** CrossEntropyLoss
 - **Epochs:** 3
 - **Batch size:** 32
 
@@ -122,55 +112,39 @@ graph TD
 
 ```
 .
-├── CNN_Fashion_MNIST.ipynb               # Main notebook
-├── data/                                 # FashionMNIST dataset (auto-downloaded by torchvision)
-├── FashionMNIST                          # Saved MLP model (torch.save)
-└── FashionMNISTCNN                       # Saved CNN model (torch.save)
+├── CNN_Fashion_MNIST.ipynb     # The whole thing lives here
+├── data/                       # FashionMNIST downloads here automatically
+├── FashionMNIST                # Saved MLP model
+└── FashionMNISTCNN             # Saved CNN model
 ```
 
 ---
 
 ## Getting Started
 
-### Prerequisites
-
-- Python 3.8+
-- PyTorch 1.12+
-- torchvision
-- matplotlib
-- numpy
-- tqdm
-
-### Installation
+### Install dependencies
 
 ```bash
 pip install torch torchvision matplotlib numpy tqdm
 ```
 
-Or if using Google Colab, these are pre-installed.
+Or just run it on Google Colab — everything's pre-installed there.
 
-### Running the Notebook
+### Run the notebook
 
-**Locally:**
 ```bash
 jupyter notebook CNN_Fashion_MNIST.ipynb
 ```
 
-**On Google Colab:**
-Upload the notebook and run all cells. The dataset will be downloaded automatically via `torchvision.datasets.FashionMNIST`.
+CUDA is detected automatically — if you have a GPU it'll use it, otherwise CPU is fine for this scale.
 
-**GPU acceleration:** The notebook auto-detects CUDA:
-```python
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-```
-
-> **Note:** If a saved model file (`FashionMNIST`) is detected in the working directory, the notebook skips training and loads the model directly. This is useful for inference without re-training.
+> If a saved model file is found in the directory, the notebook skips training and loads it directly. Handy for just running inference without waiting.
 
 ---
 
 ## Training Details
 
-| Setting         | MLP (Model 1)     | CNN (Model 2)     |
+| Setting         | MLP               | CNN               |
 |----------------|-------------------|-------------------|
 | Optimizer       | SGD               | Adam              |
 | Learning Rate   | 0.1               | 1e-3              |
@@ -178,9 +152,9 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 | Batch Size      | 32                | 32                |
 | Loss Function   | CrossEntropyLoss  | CrossEntropyLoss  |
 
-Training loss and accuracy are tracked per epoch and plotted at the end of training for each model. Evaluation is run batch-by-batch on the test set using `torch.inference_mode()`.
+Loss and accuracy are tracked per epoch and plotted. Evaluation uses `torch.inference_mode()` across the full test set.
 
-A custom `accuracy_fn` is used throughout:
+Custom accuracy function used throughout:
 ```python
 def accuracy_fn(Y_pred, Y_true):
     count = torch.eq(Y_pred, Y_true).sum().item()
@@ -191,29 +165,20 @@ def accuracy_fn(Y_pred, Y_true):
 
 ## Results
 
-After training, both models are evaluated on the full test set. Overall test accuracy and loss are reported as averages across all test batches.
+Both models are evaluated on the full test set after training. The CNN comfortably matches or beats the MLP despite training for a fraction of the time — which honestly was satisfying to see play out in practice.
 
-The CNN achieves strong performance in just **3 epochs** with Adam, typically outperforming or matching the MLP trained for **25 epochs** with SGD — demonstrating the efficiency of convolutional architectures for structured image data.
-
-Predictions are visualized on a random sample of 9 test images:
-- **Green title** → correct prediction
-- **Red title** → incorrect prediction (shows both predicted and true label)
+Predictions on 9 random test images are visualized at the end:
+- **Green** → got it right
+- **Red** → got it wrong (shows predicted vs actual label)
 
 ---
 
-## Key Concepts Covered
+## What I learned
 
-- Loading and exploring a standard image classification dataset with `torchvision.datasets`
-- Data normalization and the `transforms.Compose` pipeline
-- Building custom `nn.Module` classes (MLP and CNN)
-- The TinyVGG convolutional architecture pattern (two conv blocks + classifier head)
-- SGD vs Adam optimizers
-- `CrossEntropyLoss` for multi-class classification
-- Softmax + argmax for converting logits to predicted class indices
-- Training and evaluation loops with `model.train()` / `model.eval()`
-- Saving and loading models with `torch.save` / `torch.load`
-- Visualizing training curves (loss and accuracy over epochs)
-- Making and visualizing predictions on held-out test samples
+- Flattening an image throws away all spatial information — the MLP has no idea that nearby pixels are related
+- CNNs learn features hierarchically (edges → shapes → patterns), which is why they're so much better suited for images
+- Adam converges noticeably faster than SGD here — 3 epochs vs 25 is a difference you actually feel
+- `model.train()` and `model.eval()` don't matter much for simple architectures like these, but they will once you add BatchNorm or Dropout
 
 ---
 
